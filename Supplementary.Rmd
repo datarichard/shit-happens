@@ -1,0 +1,590 @@
+---
+title: "Supplementary Material: The Comparative Impact of Major Life Events on Cognitive and Affective Wellbeing"
+output: #html_document
+  word_document:
+    reference_docx: academic_style.docx
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(include = FALSE,
+                      eval = TRUE,
+                      echo = FALSE,
+                      message = FALSE,
+                      warning = FALSE,
+                      fig.path = "figures/")
+library(tidyverse)
+library(knitr)
+```
+\  
+\  
+
+N. Kettlewell^1,2,3^, R.W. Morris^4,5^, N. Ho^6^, D.A. Cobb-Clark^1,2,3^, S.Cripps^4^ & N.Glozier^5,6^
+
+1. School of Economics, University of Sydney, NSW, Australia
+2. ARC Centre of Excellence for Children and Families over the Life Course, University of Queensland, QLD, Australia
+3. Institute of Labor Economics (IZA), Bonn, Germany
+4. Centre for Translational Data Science, University of Sydney, NSW, Australia
+5. Central Clinical School, Faculty of Medicine and Health, University of Sydney, NSW, Australia
+6. Brain and Mind Centre, University of Sydney, NSW, Australia 
+
+\  
+
+**Corresponding author:**  
+Professor Nick Glozier  
+Faculty of Medicine and Health,   
+University of Sydney,  
+NSW 2050,  
+Australia  
+email: nick.glozier@sydney.edu.au  
+
+\  
+
+Draft: `r format(Sys.time(), '%d %B, %Y')`  
+  
+***  
+```{r, load_data, include=FALSE}
+# 22 life events included
+lifevents <- c('lefnw', 'lefni', 'lefrd', 'lejob', 'leprm', 'lertr', 'lemar',
+               'leprg', 'lebth', 'ledsc', 'lesep', 'lemvd', 'leins', 'lepcm',
+               'lejls', 'lejlf', 'ledfr', 'ledhm', 'ledrl', 'leinf', 'lercl', 
+               'levio')
+
+outcomes <- read_rds('data/outcomes.rds')
+
+outcomes %>%
+  filter(code == 'losat') %>% 
+  mutate(
+    Y = case_when(
+      val < 0 ~ NA_integer_,
+      TRUE ~ as.integer(val)
+    )
+  ) %>% 
+  select(-code, -val) -> losat.df
+
+outcomes %>%
+  filter(code == 'mcs') %>%
+  select(-code, Y = val) -> mcs.df
+
+# load the raw life event data (for extraction details see Appendix)
+lifevents.raw <- read_rds('data/raw_events.rds')
+
+# load the list of event data arranged by time points
+events_by_time <- read_rds('data/events_by_time.rds')
+
+# list of event names
+renamevents <- list(
+    Widowed = "ledsc",    
+    Separated = "lesep",
+    Money_lost = "lefnw",
+    Jailed = "lejls",
+    Attacked = "levio",
+    Health_shock = "leins",
+    Reconciled = "lercl", 
+    Fired = "lefrd", 
+    Family_harmed = "leinf",   
+    Robbed = "lepcm",
+    Friend_died = "ledfr",
+    Relative_died = "ledrl",
+    Relative_jailed = "lejlf",
+    Home_lost = "ledhm",
+    Moved = "lemvd",
+    Hired = "lejob",
+    Promoted = "leprm",
+    Retired = "lertr",
+    Money_gained = "lefni",
+    Pregnant = "leprg",
+    Childbirth = "lebth",
+    Married = "lemar"
+    )
+
+# time levels
+timelevels = c('pre36', 'pre24', 'pre12', 'post03', 'post06', 'post09', 
+               'post12', 'post24', 'post36', 'post48')
+
+# x-axis labels for plotting
+xlabels = c(
+    "pre24" = "-24", "pre12" = "-12", "post03" = "+3", 
+    "post06" = "+6", "post09" = "+9", "post12" = "+12", 
+    "post12" = "+24", "post36" = "+36", "post48" = "+48"
+  )
+```
+\  
+
+## Missingness
+***
+#### Missing Responses
+The percent missing responses range from 11.61 percent for *Married* to 12.39 percent for death of a close friend (*Friend died*).  
+
+```{r, missingresponses, include=TRUE}
+lifevents.raw %>%
+  rename(HILDA_event_code = code) %>%
+  group_by(HILDA_event_code) %>%
+  count(val) %>%
+  filter(val > -10) %>%
+  summarise(missing = sum(n[val < 0])/sum(n)*100) %>%
+  kable(digits = c(NA, 2),
+        caption = 'Table S1. Mean percentage of missing life event responses (HILDA 2002 to 2016)')
+``` 
+
+\ 
+
+#### Missing People  
+The percent of missing people range from 33.91 percent for home destroyed by natural disaster (*Home lost*) to 34.58 for promotion at work (*Promoted*).  
+
+```{r, missingpeople, include=TRUE}
+lifevents.raw %>%
+  rename(HILDA_event_code = code) %>%
+  group_by(HILDA_event_code) %>%
+  count(val) %>%
+  summarise(missing = sum(n[val < 0])/sum(n)*100) %>%
+  kable(digits = c(NA, 2),
+        caption = 'Table S2. Mean percentage of missing people (HILDA 2002 to 2016)')
+``` 
+
+## Variables  
+***
+
+#### Wellbeing measures over time
+The mean change in average wellbeing scores (along with 95 percent confidence intervals) among all HILDA participants over time is shown in Figure S1 below. The overall amount of change is very slight in both cases, albeit with some small decrease in affective wellbeing after 2011.  
+
+```{r, wellbeing_timeplot, fig.width=7, fig.height=5, include=TRUE}
+outcomes %>%
+  rename(Wellbeing = code) %>%
+  filter(Wellbeing != "ghmh", val >= 0) %>%
+  mutate(
+    Wellbeing = recode(Wellbeing, losat = "Cognitive", mcs = "Affective"),
+    val = ifelse(Wellbeing == "Cognitive", val*6, val)
+  ) %>%
+  rowwise() %>%
+  mutate(year = which(letters %in% wave) + 2000) %>%
+  ggplot(aes(x = year, y = val, group = Wellbeing)) +
+    geom_smooth(aes(color = Wellbeing)) +
+    coord_cartesian(xlim = c(2000, 2016)) +
+    scale_y_continuous("Affective (mental component score)", 
+                       sec.axis = sec_axis(~./6, 
+                                           name = "Cognitive (life satisfaction score)")) +
+    annotate("text", x = 2002, y = 49, label = "Affective", color = "Salmon", fontface = "bold") +
+    annotate("text", x = 2002, y = 47.25, label = "Cognitive", color = "#00BFC4", fontface = "bold") +
+    labs(title = "Figure S1. Wellbeing changes over time", 
+         subtitle = "Mean (±95 percent confidence) life satisfaction and mental component scores") +
+    theme_light() +
+    theme(legend.position="none")
+```
+
+#### Life event frequencies
+As an expectation of sample size (n) for each model, the number of people experiencing each life event at least once in HILDA is shown below. The most commonly experienced event was *Moved* and the least common event was spending time in jail (*Jailed*).
+
+```{r, event_count, fig.width=7, fig.height=7, include=TRUE}
+lifevents.raw %>%
+  mutate(type = fct_recode(code, !!!renamevents),
+         val = recode(val, "2" = 1, "1" = 0, .default = NA_real_)) %>%
+  rowwise() %>%
+  mutate(year = which(letters %in% wave) + 2000) %>%
+  ungroup() %>%
+  select(xwaveid, type, year, val) %>%
+  arrange(xwaveid, year, type) -> events
+
+events %>%
+  filter(val == 1) %>%
+  select(xwaveid, type) %>%
+  distinct() %>%
+  count(type) %>%
+  ggplot(aes(x = fct_reorder(type, n), y = n)) +
+    geom_col() +
+    coord_flip() +
+    labs(title = "Figure S2. Commonly experienced events",
+         subtitle = "Count of people (HILDA 2002 - 2016)",
+         x = "", y = "")
+```
+
+Because we included multiple occurrences of the same event in our model, we also wished to determine how often each life event occurred in the observed period for each individual (i.e., the individual event rate). To answer this we calculated the event rate per year for each year of observation for each individual (removing the "censored" years ±3 within the beginning or end of the observed data). We then calculated the average rate over the observed time for each individual and present the average for each event. The figure below shows the most frequent event experienced at an individual level was injury/illness of a family member (*Family harmed*), getting a new job (*Hired*) or getting pregnant (*Pregnant*). The least frequent event was spouse or child dying (*Widowed*), getting married (*Married*) or spending time in jail (*Jailed*).  
+
+
+```{r, event_rate, fig.width=7, fig.height=7, include=TRUE}
+# This sums the number of events three rows ahead and behind and then 
+# calculates the rate  (per year) over the time period examined
+events %>%
+  arrange(type, xwaveid, year) %>%
+  group_by(type, xwaveid) %>%
+  mutate(total = sum(val)) %>%
+  filter(total > 0) %>%
+  mutate(
+    lag1 = lag(val, 1, default = 0),
+    lag2 = lag(val, 2, default = 0),
+    lag3 = lag(val, 3, default = 0),
+    lead1 = lead(val, 1, default = 0),
+    lead2 = lead(val, 2, default = 0),
+    lead3 = lead(val, 3, default = 0),
+    time_period = lead(year, 3, default = max(year)) - lag(year, 3, default = min(year))) %>%
+  filter(max(time_period) > 0) %>%
+  ungroup() %>%
+  mutate(
+    rollsum = rowSums(select(., val, lag1, lag2, lag3, lead1, lead2, lead3)),
+    rate = rollsum / time_period
+  ) -> event_rate
+
+event_rate %>%
+  filter(time_period > 5) %>% # remove censored years
+  group_by(type, xwaveid) %>%
+  summarise(
+    individual_rate = mean(rate)
+  ) %>%
+  ungroup() %>%
+  group_by(type) %>%
+  summarise(
+    rate = mean(individual_rate),
+    sem = sd(individual_rate)/sqrt(n()),
+    n = n(),
+    upp_rate = rate + sem*2,
+    low_rate = rate - sem*2
+  ) %>%
+  ggplot(aes(x = fct_reorder(type, rate), y = rate)) +
+  geom_pointrange(aes(ymin = low_rate, ymax = upp_rate)) +
+  geom_hline(aes(yintercept = 0.1428), linetype = 2) +
+  coord_flip() +
+  labs(title = "Figure S3. Rate of each event type",
+       subtitle = "Mean rate (±95 percent CI) among individuals experiencing the event",
+       caption = "Dashed line indicates once per six years",
+       x = "", y = "rate per year")
+```
+
+The mean event rate falls to the right of the dashed line indicating that most events are experienced more than once on average within our time window (7 years). However there are very few events that occur more than once every four years since all 95 percent confidence intervals fall to the left of 0.25, which means our post-event estimates (+3 to +48 months) are unlikely to reflect more than one event.   
+
+
+## Correlations
+***
+One of our aims is to observe differences in life satisfaction and mental health in response to life events. One concern is that cognitive wellbeing and affective wellbeing scores might be highly correlated, in which case we are unlikely to observe differences between them. We can also expect there will be correlations between the occurrence of life events. For instance, getting pregnant and giving birth can be expected to co-occur. If individuals who experience one type of life event are likely to experience several others, then we would expect to see a discrepancy between the unconditional and the conditional marginal effects of these events. We present the correlations between life events in Table S3 below.
+
+```{r, correlations, fig.width=9, fig.height=9, include=TRUE}
+library(corrr)
+
+bind_rows(mutate(losat.df, code = 'life satisfaction'),
+          mutate(mcs.df, code = 'mental health')) %>% 
+  spread(code, Y) %>%
+  ungroup() %>%
+  select('mental health', 'life satisfaction') %>%
+  # correlate(method = 'pearson', quiet = TRUE)
+  na.omit() %>%
+  cor -> ans
+
+#### Calculate correlations between life events ####
+# Represent temporal trace of events (smoothing = 1/x)
+corrlabels = c(
+  "pre36" = 1/36, "pre24" = 1/24, "pre12" = 1/12,
+  "post03" = 1, "post06" = 1/3, "post09" = 1/6,
+  "post12" = 1/9, "post24" = 1/12, "post36" = 1/24,
+  "post48" = 1/36
+)
+
+# All the event traces will be stored here
+traces <- data.frame(xwaveid = character(), wave = character())
+
+for (name in names(events_by_time)) {
+  events_by_time[[name]] %>% 
+    gather(time, ind, -xwaveid, -wave) %>%
+    filter(ind == 1) %>%
+    select(-ind) %>%
+    mutate(time = recode(time, !!!corrlabels)) %>%
+    group_by(xwaveid, wave) %>%
+    summarise(time = max(time, na.rm = TRUE)) %>% 
+    rename(!!name := time) %>%
+    arrange(xwaveid, wave) -> event.df
+  
+  event.df %>%
+    ungroup() %>%
+    full_join(traces, by = c("xwaveid", "wave")) %>%
+    arrange(xwaveid, wave) -> traces
+}
+
+# Calculate correlations among event traces
+traces %>%
+  replace(., is.na(.), 0) %>%
+  rename(!!unlist(renamevents)) %>%
+  select(-xwaveid, -wave) %>%
+  correlate(quiet = TRUE) %>% # -> cor.mat 
+  rearrange() -> cor.df  # rearrange by correlations
+
+cor.df %>%
+  gather(colname, val, -rowname) %>%
+  filter(val == max(val, na.rm = TRUE)) %>%
+  head(1) -> maxcor
+
+# Plot the event correlations
+cor.df %>%
+  shave() %>%
+  stretch() %>% 
+  replace_na(list(r = 0)) %>%
+  ggplot(aes(x, y)) +
+  geom_tile(aes(fill = r), colour = "white") + 
+  scale_fill_gradient(low = "white", high = "red") +
+  #     scale_fill_gradient2(limits = c(-1, 1), low = "blue", mid = "white", high = "red") +
+  scale_x_discrete(limits=colnames(cor.df)[-1]) + 
+  scale_y_discrete(limits=colnames(cor.df)[-1]) +
+  labs(title = 'Table S3. Correlations between life events',
+       subtitle = 'Pairwise correlations among people with a life event ±3 years',
+       x = '',
+       y = '') +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+```
+
+The well-being measures are only moderately associated with each other, *$r^2$* = `r round(ans[2]^2, 2)`. Among life events, the correlations are moderate with the largest correlation between *`r maxcor[['rowname']]`* and *`r maxcor[['colname']]`*, where *$r$* = `r round(maxcor[['val']], 2)`. Other notable correlations occurred between *Separated* and *Reconciled* (*$r$* = `r cor.df %>% stretch() %>% filter(x == "Separated", y == "Reconciled") %>% pull(r) %>% round(2)`), losing a job (*Fired*) and starting a new job (*Hired*) (*$r$* = `r cor.df %>% stretch() %>% filter(x == "Fired", y == "Hired") %>% pull(r) %>% round(2)`), as well as moving home (*Moved*) and starting a new job (*Hired*) (*$r$* = `r cor.df %>% stretch() %>% filter(x == "Moved", y == "Hired") %>% pull(r) %>% round(2)`).   
+
+## Sensitivity analyses
+***
+```{r, balanced_model, eval=FALSE}
+# This model only includes individuals with an equal number of observations before 
+# and after the event. Thus it is a balanced model. It also includes every other 
+# available event as well as seifa index, education, and wave. 
+#
+
+# Our helpful wrapper returns the coefficients
+source('src/supplementaryModels.r') 
+covariates <- read_rds('data/covariates.rds')
+losat.results <- supplementaryModels(losat.df, events_by_time, covariates, balance = TRUE)
+mcs.results <- supplementaryModels(mcs.df, events_by_time, covariates, balance = TRUE)
+
+# Combine results
+losat.results$outcome <- 'losat'
+mcs.results$outcome <- 'mcs'
+bind_rows(losat.results, mcs.results) -> results
+
+# Calculate confidence intervals on clustered errors
+results$upper <- results$estimate - results$std.error*qt(p = 0.1, df = results$n-1)
+results$lower <- results$estimate + results$std.error*qt(p = 0.1, df = results$n-1)
+
+# Save the results (you can view this table as a csv file in the results/)
+write_csv(results, path = 'results/balanced_results.csv')
+# head(results)
+```
+
+```{r, clean_model, eval=FALSE}
+# This full model only includes scores with no unobserved data within 3 years 
+# of the score. Thus it reduces the risk of contamination from unobserved 
+# events and it also includes every other available event as well as seifa 
+# index, education, and wave. 
+#
+
+# Our helpful wrapper returns the coefficients
+losat.results <- supplementaryModels(losat.df, events_by_time, covariates, clean = TRUE, balance = TRUE)
+mcs.results <- supplementaryModels(mcs.df, events_by_time, covariates, clean = TRUE, balance = TRUE)
+
+# Combine results
+losat.results$outcome <- 'losat'
+mcs.results$outcome <- 'mcs'
+bind_rows(losat.results, mcs.results) -> results
+
+# Calculate confidence intervals on clustered errors
+results$upper <- results$estimate - results$std.error*qt(p = 0.1, df = results$n-1)
+results$lower <- results$estimate + results$std.error*qt(p = 0.1, df = results$n-1)
+
+# Save the results (you can view this table as a csv file in the results/)
+write_csv(results, path = 'results/clean_results.csv')
+# head(results)
+```
+
+#### Balanced Models
+In Figure S4 we examine a model which only includes individuals with observations before and after the event. Balancing the model in this manner means that the same cohort of people will contribte to all the pre- and post-event coefficients. However it will also restrict the sample size, reducing efficiency and potentially exposing the estimates to sample selection bias.  
+
+All the same covariates from the conditional models are included in the balanced models here.
+
+```{r, balanced_plot, fig.width=12, fig.height=10, include=TRUE}
+source('src/psth.r')
+
+good_events <- c(
+  "Married", "Childbirth", "Money_gained", 
+  "Retired", "Pregnant", "Promoted", 
+  "Hired", "Moved", "Reconciled"
+  )
+
+bad_events <- c(
+  "Widowed", "Separated", "Money_lost",
+  "Health_shock", "Attacked", "Fired", 
+  "Family_harmed", "Friend_died", "Robbed"
+  )
+
+read_csv(
+    'results/balanced_results.csv', 
+    col_types = cols(
+        code = col_character(),
+        term = col_character(),
+        estimate = col_double(),
+        std.error = col_double(),
+        statistic = col_double(),
+        p.value = col_double(),
+        std.error = col_double(),
+        df = col_double(),
+        n = col_double(),
+        N = col_double(),
+        outcome = col_character(),
+        upper = col_double(),
+        lower = col_double()
+        )
+    ) %>%
+  mutate(
+      # term = factor(term, levels = timelevels, ordered = TRUE),
+      # code = factor(code, levels = lifevents, ordered = TRUE)
+      code = fct_recode(code, !!!renamevents)
+      ) -> results
+
+# levels(results$code) <- renamevents
+
+#### Plot coefficients from balanced model ####
+figureS4a_str <- c('Figure S4a. Balanced effect of positive life events (HILDA 2002 to 2016)')
+psth(results, good_events, figureS4a_str)
+
+figureS4b_str <- c('Figure S4b. Balanced effect of negative life events (HILDA 2002 to 2016)')
+psth(results, bad_events, figureS4b_str)
+```
+
+The balanced model results remain consistent with the general pattern observed in Figures 1 & 2, despite the relatively restricted sample.
+
+#### Uncontaminated Models
+Up until this point, we have been assuming that unlabelled time points do not contain life events (i.e., our implicit imputation is that missing = zero). This might not be true, and unreported life events may be producing changes we are not modelling, and so result in biased estimates. We can omit waves in which there is missing life event data within the time window we are studying (7 years). This will even further restrict our *n* (as well as increase our exposure to potential selection effects), but the remaining observations should be uncontaminated by unobserved events. In Figure S5 below we plot the results of an uncontaminated model, with all the same covariates as before, and restricted to a balanced and uncontaminated sample.
+
+```{r, clean_plot, fig.width=12, fig.height=10, include=TRUE}
+read_csv(
+    'results/clean_results.csv', 
+    col_types = cols(
+        code = col_character(),
+        term = col_character(),
+        estimate = col_double(),
+        std.error = col_double(),
+        statistic = col_double(),
+        p.value = col_double(),
+        std.error = col_double(),
+        df = col_double(),
+        n = col_double(),
+        N = col_double(),
+        outcome = col_character(),
+        upper = col_double(),
+        lower = col_double()
+        )
+    ) %>%
+  mutate(
+      term = factor(term, levels = timelevels, ordered = TRUE),
+      code = factor(code, levels = lifevents, ordered = TRUE)
+      ) -> results
+
+levels(results$code) <- renamevents
+
+#### Plot coefficients from unconditional model ####
+figureS5a_str <- c('Figure S5a. Uncontaminated effect of positive life events (HILDA 2005 to 2012)')
+psth(results, good_events, figureS5a_str)
+
+figureS5b_str <- c('Figure S5b. Uncontaminated effect of negative life events (HILDA 2005 to 2012)')
+psth(results, bad_events, figureS5b_str)
+```
+
+Comparing the uncontaminated effect of the same events to our earlier results (e.g., Figure 2), we can see many of the observations we made earlier cannot be generalized. The reduction in available sample (n) has reduced our ability to see clear differences in the size of the effect between different events in this restricted dataset. 
+
+## Residual analysis
+***
+We plot model residual values against the predicted (fitted) values in order to check for unexplained effects. Each figure was generated by the "full effect" model (Figure 1), with no additional covariates apart from year. Each of the plots below is well-behaved: there is little or no observable structure or patterns between the residual and fitted value. Moreover, the residual values form a horizontal band around the 0 line, indicating the variances of the error terms are equal. Finally, no outliers are visible in any of the plots.
+
+#### Cognitive wellbeing unconditional model residuals  
+
+```{r, happyresiduals, fig.width=9, fig.height=10, include=TRUE}
+resid.results <- read_rds('data/uncondition_resid.rds')
+
+resid.results %>%
+  filter(outcome == 'losat') %>%
+  ggplot(aes(pred, resid)) +
+    geom_point(alpha = 0.1, size = 0.1) +
+    # geom_smooth(method = 'gam') +
+    facet_wrap(~ code, scales = 'free_x') +
+    theme_light() +
+    labs(title = 'Figure S6. Cognitive wellbeing model residuals vs fitted',
+         subtitle = 'Residuals', x = 'Fitted', y = '')
+```
+
+\ \ 
+
+#### Affective wellbeing unconditional model residuals  
+
+```{r, mentalresiduals, fig.width=9, fig.height=10, include=TRUE}
+resid.results %>%
+  filter(outcome == 'mcs') %>%
+  ggplot(aes(pred, resid)) +
+    geom_point(alpha = 0.1, size = 0.1) +
+    # geom_smooth(method = 'gam') +
+    facet_wrap(~ code, scales = 'free_x') +
+    theme_light() +
+    labs(title = 'Figure S7. Affective wellbeing model residuals vs fitted',
+         subtitle = 'Residuals', x = 'Fitted', y = '')
+```
+
+
+# Appendix
+***
+
+## Preprocessing  
+
+Importing the data from the combined HILDA data files (.dta) requires over 12Gb of RAM, which can begin to broach the limits of restricted systems such as old laptops.
+
+```{r, libraries, include=TRUE, eval=FALSE, echo=TRUE}
+library(tidyverse)
+library(haven)
+library(knitr)
+
+#### Helper functions
+source('src/GetRaws.R')
+source('src/GetMCS.R')
+```
+
+```{r load, include=TRUE, eval=FALSE, echo=TRUE}
+#### Load data ####
+filepaths <- list.files(
+  path = '~/Dropbox/HILDA/data',
+  pattern = '^Combined.*.dta$',
+  full.names = TRUE
+)
+
+hilda <- list()
+for (pathtofile in filepaths) {
+  df <- read_dta(pathtofile)
+  hilda <- append(hilda, list(df))
+  cat('.')
+}
+```
+
+Here we use a wrapper function called `GetRaws` and `GetEvents` (see `src/`) to get the life events we need. The GetEvents wrapper will can generate "clean" (uncontaminated) event tables, or "balanced" event tables. Each of the data frames is stored in `data/`.
+
+```{r, extract, include=TRUE, eval=FALSE, echo=TRUE}
+# Get the life events raw codes in the HILDA dataset
+lifevents <- c('lefnw', 'lefni', 'lefrd', 'lejob', 'leprm', 'lertr', 'lemar',
+               'leprg', 'lebth', 'ledsc', 'lesep', 'lemvd', 'leins', 'lepcm',
+               'lejls', 'lejlf', 'ledfr', 'ledhm', 'ledrl', 'leinf', 'lercl', 'levio')
+
+lifevents.raw <- GetRaws(hilda, lifevents)
+write_rds(lifevents.raw, 'data/raw_events.rds')
+```
+
+We also need the outcome variables. We have a wrapper to get the SF-36 variables and calculate the MCS score according to the ABS 1997 norms (`GetMCS`). 
+
+```{r, outcomes, include=TRUE, eval=FALSE, echo=TRUE}
+# Get outcome variables
+mcs <- GetMCS(hilda)
+
+GetRaws(hilda, c('losat', 'ghmh')) %>%
+  bind_rows(mcs) -> outcomes
+
+write_rds(outcomes, 'data/outcomes.rds')
+
+#### Get covariates ####
+GetRaws(hilda, c('hgage', 'hhda10', 'edhigh1')) -> covariates
+
+GetRaws(hilda, 'hgsex') %>%
+  group_by(xwaveid) %>%
+  summarise(sex = round(mean(val))) %>%
+  mutate(val = sex - 1,
+         code = 'female') %>%
+  select(xwaveid, code, val) %>%
+  bind_rows(covariates) %>%
+  arrange(xwaveid, code, wave) -> demographics
+
+write_rds(demographics, 'data/demographics.rds')
+```
+
+
+#### To do
+1. Add the wrapper functions as code blocks
