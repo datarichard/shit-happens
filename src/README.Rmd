@@ -2,8 +2,8 @@
 title: "The Differential Impact of Major Life Events on Cognitive and Affective Wellbeing"
 author: "N. Kettlewell^1,2,3^, R.W. Morris^4,5^, N. Ho^6^, D.A. Cobb-Clark^1,2,3^, S.Cripps^4^ & N.Glozier^5,6^"
 output: github_document  
-bibliography: eps_references.bib
-csl: elsevier-harvard.csl
+bibliography: src/eps_references.bib
+csl: src/elsevier-harvard.csl
 ---
 
 ```{r, init, include=FALSE}
@@ -12,7 +12,7 @@ knitr::opts_chunk$set(include = FALSE,
                       echo = FALSE,
                       message = FALSE,
                       warning = FALSE,
-                      fig.path = "../figures/")
+                      fig.path = "figures/")
 ```
 ```{r, setup}
 # packages needed
@@ -183,7 +183,7 @@ The analysis was performed in *R* (version 3.5.1) [@rcore2013], using the tidyve
   
 
 ```{r, variables}
-outcomes <- read_rds('../data/outcomes.rds')
+outcomes <- read_rds('data/outcomes.rds')
 
 outcomes %>%
   filter(code == 'losat') %>% 
@@ -210,13 +210,13 @@ outcomes %>%
 #   select(-code, Y = val) -> affect.df
 
 # load the list of life event data (for preprocessing see Appendix)
-events_by_time <- read_rds('../data/events_by_time.rds')
+events_by_time <- read_rds('data/events_by_time.rds')
 ```
 
 ```{r, covariates}
 #### Add covariates ####
 # Load the preprocessed demographic data (for preprocessing see Appendix)
-demographics <- read_rds('../data/demographics.rds')
+demographics <- read_rds('data/demographics.rds')
 
 # socioeconomic status (hhda10)
 demographics %>%
@@ -270,7 +270,7 @@ edu.df %>%
   left_join(seifa.df, by = c("xwaveid", "wave")) -> covariates
 ```
 ```{r, write_covariates, eval=FALSE}
-write_rds(covariates, '../data/covariates.rds') # save for supplementary analysis
+write_rds(covariates, 'data/covariates.rds') # save for supplementary analysis
 ```
 
 ```{r, unconditional_models, eval=FALSE}
@@ -280,7 +280,7 @@ write_rds(covariates, '../data/covariates.rds') # save for supplementary analysi
 # events as well as the risk of contamination from unobserved events. 
 #
 # Our helpful wrapper returns the coefficients, residuals and covariance matrix
-source('unconditionalModels.R') 
+source('src/unconditionalModels.R') 
 cognitive.results <- unconditionalModels(cognitive.df, events_by_time, timelevels, lifevents)
 affective.results <- unconditionalModels(affect.df, events_by_time, timelevels, lifevents)
 
@@ -321,7 +321,7 @@ write_csv(results, path = 'results/unconditional_results.csv')
 # education, and wave, which should reveal the unique effect of each event. 
 #
 # Our helpful wrapper returns the coefficients and covariance matrix
-source('conditionalModels.R')
+source('src/conditionalModels.R')
 cognitive.results <- conditionalModels(cognitive.df, events_by_time, covariates, timelevels, lifevents)
 affective.results <- conditionalModels(affect.df, events_by_time, covariates, timelevels, lifevents)
 
@@ -373,10 +373,10 @@ The most widely experienced event (i.e., highest proportion of sample experienci
 We a priori defined 9 positively and 9 negatively valenced events and present them in separate figures to facilitate comparison between events of the same valence (although this was not born out for reconciliation which had an anticipatory negative effect and no positive effect). *Married*, *Childbirth* and a major financial gain  (*Money gained*) produce the largest positive impact on wellbeing, while *Widowed*, *Separated* and major financial loss (*Money lost*) produced the largest negative impact on wellbeing.   
 
 ```{r unconditional_good_plot, fig.width=9, fig.height=8, include=TRUE}
-source('psth.R')
+source('src/psth.R')
 
 read_csv(
-    '../results/unconditional_results.csv', 
+    'results/unconditional_results.csv', 
     col_types = cols(
         code = col_character(),
         term = col_character(),
@@ -421,7 +421,7 @@ Sometimes the effect of a life event seems to precede the time of the event (-24
 
 ```{r, conditional_good_plot, fig.width=9, fig.height=8, include=TRUE}
 read_csv(
-    '../results/conditional_results.csv',
+    'results/conditional_results.csv',
     col_types = cols(
         code = col_character(),
         term = col_character(),
@@ -466,11 +466,11 @@ The conditional effect of most life events on wellbeing revealed a similar relat
 The combined magnitude and duration of life events, summarised by the area-under-the-curve (AUC) of the wellbeing response to each event is shown in Figure 5. Comparing the AUC from each unconditional model with each conditional model indicates the strength of the confounding by other events and time varying covariates. Each vertical crossbar represents the AUC and the interval around the crossbar represents 95 percent confidence intervals. As expected, the conditional effects are generally closer to zero (i.e. smaller) than the unconditional effects. However, there are exceptions such as *Widowed*, where the large negative impact is not affected by adjusting for other life events, and the three events with the most negative impact remain significant. The differential impact of positive events on cognitive wellbeing and affective wellbeing is shown in Figure 5 (and Supplementary Table S6). Marriage, retirement and childbirth had positive effects on cognitive wellbeing but no overall effect on affective wellbeing, separation had a greater negative effect on cognitive than affective wellbeing, whilst moving home was associated with a negative effect on cognitive wellbeing but no affective wellbeing response.  
 
 ```{r, auc, fig.width=9, fig.height=8, include=TRUE}
-source('table_auc.R')
-unconditional_covar <- read_rds('../data/unconditional_covar.rds')
-unconditional_coefs <- read_csv('../results/unconditional_results.csv')
-conditional_covar <- read_rds('../data/conditional_covar.rds')
-conditional_coefs <- read_csv('../results/conditional_results.csv')
+source('src/table_auc.R')
+unconditional_covar <- read_rds('data/unconditional_covar.rds')
+unconditional_coefs <- read_csv('results/unconditional_results.csv')
+conditional_covar <- read_rds('data/conditional_covar.rds')
+conditional_coefs <- read_csv('results/conditional_results.csv')
 
 auc.unconditional <- table_auc(unconditional_covar, unconditional_coefs)
 auc.conditional <- table_auc(conditional_covar, conditional_coefs)
@@ -516,7 +516,7 @@ results %>%
          x = "")
 ```
 ```{r, write_auc_results, eval=FALSE}
-write_csv(results, "../results/auc_results.csv")
+write_csv(results, "results/auc_results.csv")
 ```
 **Figure 5 legend.** _Total impact (AUC) of life-events on affective and cognitive wellbeing, for conditional (left panel) and unconditional models (right panel) in sd units. See equation (2) for formulaic details. Stars indicate the results of a two-tailed test of differences between cognitive and affective wellbeing for each event_ (\*_p_ < .05, \*\*_p_ < .01, \*\*\*_p_ < .001).    
 

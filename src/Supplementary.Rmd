@@ -11,7 +11,7 @@ knitr::opts_chunk$set(include = FALSE,
                       echo = FALSE,
                       message = FALSE,
                       warning = FALSE,
-                      fig.path = "../figures/")
+                      fig.path = "figures/")
 library(tidyverse)
 library(corrr)
 library(knitr)
@@ -28,13 +28,13 @@ lifevents <- c('lefnw', 'lefni', 'lefrd', 'lejob', 'leprm', 'lertr', 'lemar',
                'lejls', 'lejlf', 'ledfr', 'ledhm', 'ledrl', 'leinf', 'lercl', 
                'levio')
 
-outcomes <- read_rds('../data/outcomes.rds')
+outcomes <- read_rds('data/outcomes.rds')
 
 # load the raw life event data (for extraction details see Appendix)
-lifevents.raw <- read_rds('../data/raw_events.rds')
+lifevents.raw <- read_rds('data/raw_events.rds')
 
 # load the list of event data arranged by time points
-events_by_time <- read_rds('../data/events_by_time.rds')
+events_by_time <- read_rds('data/events_by_time.rds')
 
 # list of event names
 renamevents <- list(
@@ -117,7 +117,7 @@ lifevents.raw %>%
 Affective wellbeing was calculated from the sum of the nine sub-items of item 9 in the SF36 (9a -9i). Five sub-items measure negative aspects of wellbeing, while four sub-itmes measure positive aspects. We reverse scored items so higher scores indicated higher (better) wellbeing. To describe the relationship between the total score (i.e., affective wellbeing score) and the set of nine sub-items it was constructed from (9a-9i), we present the average item-total correlation. 
 
 ```{r item_total, fig.width=7, fig.height=4, include=TRUE}
-gh9_items <- read_rds('../data/gh9_items.rds')
+gh9_items <- read_rds('data/gh9_items.rds')
 
 # Average item total correlation
 gh9_items %>%
@@ -365,19 +365,19 @@ tribble(
 ## Regression coefficients from main models
 
 ```{r import_coefs, eval=TRUE}
-conditional_cognitive <- read_csv("../results/conditional_results.csv") %>%
+conditional_cognitive <- read_csv("results/conditional_results.csv") %>%
   filter(outcome == "cognitive") %>%
   mutate(code = fct_recode(code, !!!renamevents))
 
-unconditional_cognitive <- read_csv("../results/unconditional_results.csv") %>%
+unconditional_cognitive <- read_csv("results/unconditional_results.csv") %>%
   filter(outcome == "cognitive") %>%
   mutate(code = fct_recode(code, !!!renamevents))
 
-conditional_affective <- read_csv("../results/conditional_results.csv") %>%
+conditional_affective <- read_csv("results/conditional_results.csv") %>%
   filter(outcome == "affective") %>%
   mutate(code = fct_recode(code, !!!renamevents))
 
-unconditional_affective <- read_csv("../results/unconditional_results.csv") %>%
+unconditional_affective <- read_csv("results/unconditional_results.csv") %>%
   filter(outcome == "affective") %>%
   mutate(code = fct_recode(code, !!!renamevents))
 ```
@@ -438,7 +438,7 @@ The table shows the comparative impact of each event arranged by *Z-*value from 
 ```{r table_s6, include=TRUE}
 codes_to_remove <- c("Jailed", "Home_lost", "Relative_jailed", "Relative_died")
 
-read_csv("../results/auc_results.csv") %>%
+read_csv("results/auc_results.csv") %>%
   filter(!code %in% codes_to_remove) %>%
   group_by(model, code) %>%
   mutate(N = min(N)) %>%
@@ -462,8 +462,8 @@ read_csv("../results/auc_results.csv") %>%
 #
 
 # Our helpful wrapper returns the coefficients
-source('supplementaryModels.r') 
-covariates <- read_rds('../data/covariates.rds')
+source('src/supplementaryModels.r') 
+covariates <- read_rds('data/covariates.rds')
 losat.results <- supplementaryModels(losat.df, events_by_time, covariates, balance = TRUE)
 mcs.results <- supplementaryModels(mcs.df, events_by_time, covariates, balance = TRUE)
 
@@ -477,7 +477,7 @@ results$upper <- results$estimate - results$std.error*qt(p = 0.1, df = results$n
 results$lower <- results$estimate + results$std.error*qt(p = 0.1, df = results$n-1)
 
 # Save the results (you can view this table as a csv file in the results/)
-write_csv(results, path = '../results/balanced_results.csv')
+write_csv(results, path = 'results/balanced_results.csv')
 ```
 
 ```{r, clean_model, eval=FALSE}
@@ -510,7 +510,7 @@ In Figure S6 we examine a model which only includes individuals with observation
 All the same covariates from the conditional models are included in the balanced models here.
 
 ```{r, balanced_plot, fig.width=12, fig.height=10, include=TRUE}
-source('psth.R')
+source('src/psth.R')
 
 good_events <- c(
   "Married", "Childbirth", "Money_gained", 
@@ -525,7 +525,7 @@ bad_events <- c(
   )
 
 read_csv(
-    '../results/balanced_results_v1.csv', 
+    'results/balanced_results_v1.csv', 
     col_types = cols(
         code = col_character(),
         term = col_character(),
@@ -566,7 +566,7 @@ Up until this point, we have been assuming that unlabelled time points do not co
 
 ```{r, clean_plot, fig.width=12, fig.height=10, include=TRUE}
 read_csv(
-    '../results/clean_results_v1.csv', 
+    'results/clean_results_v1.csv', 
     col_types = cols(
         code = col_character(),
         term = col_character(),
@@ -607,7 +607,7 @@ We plot model residual values against the predicted (fitted) values in order to 
 #### Cognitive wellbeing unconditional model residuals  
 
 ```{r, happyresiduals, fig.width=9, fig.height=10, include=TRUE}
-resid.results <- read_rds('../data/uncondition_resid.rds')
+resid.results <- read_rds('data/uncondition_resid.rds')
 
 resid.results %>%
   filter(outcome == 'losat') %>%

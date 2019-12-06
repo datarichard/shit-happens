@@ -806,7 +806,7 @@ describe the relationship between the total score (i.e., affective
 wellbeing score) and the set of nine sub-items it was constructed from
 (9a-9i), we present the average item-total correlation.
 
-![](../figures/item_total-1.png)<!-- -->
+![](figures/item_total-1.png)<!-- -->
 
 This shows that each sub-item (9a-9i) has a moderate to high correlation
 with the total score (affective wellbeing), since all sub-items
@@ -823,7 +823,7 @@ Figure S2 below. The overall amount of change is very slight in both
 cases, albeit with some small decrease in affective wellbeing after
 2011.
 
-![](../figures/wellbeing_timeplot-1.png)<!-- -->
+![](figures/wellbeing_timeplot-1.png)<!-- -->
 
 #### Life event frequencies
 
@@ -832,7 +832,7 @@ each model, the number of people experiencing each life event at least
 once in HILDA is shown below. The most commonly experienced event was
 *Moved* and the least common event was spending time in jail (*Jailed*).
 
-![](../figures/event_count-1.png)<!-- -->
+![](figures/event_count-1.png)<!-- -->
 
 *b. Rate for each individual (per year)*. Because we included multiple
 occurrences of the same event in our model, we also wished to determine
@@ -848,7 +848,7 @@ harmed*), getting a new job (*Hired*) or getting pregnant (*Pregnant*).
 The least frequent event was spouse or child dying (*Widowed*), getting
 married (*Married*) or spending time in jail (*Jailed*).
 
-![](../figures/event_rate-1.png)<!-- -->
+![](figures/event_rate-1.png)<!-- -->
 
 When the mean event rate falls to the right of the dashed line, then
 that event is experienced more than once on average within our time
@@ -873,7 +873,7 @@ discrepancy between the unconditional and the conditional marginal
 effects of these events. We present the correlations between life events
 in Figure S5 below.
 
-![](../figures/correlations-1.png)<!-- -->
+![](figures/correlations-1.png)<!-- -->
 
 The well-being measures are only moderately associated with each other,
 *\(r^2\)* = 0.23. Among life events, the correlations are moderate with
@@ -20867,7 +20867,7 @@ All the same covariates from the conditional models are included in the
 balanced models
 here.
 
-![](../figures/balanced_plot-1.png)<!-- -->![](../figures/balanced_plot-2.png)<!-- -->
+![](figures/balanced_plot-1.png)<!-- -->![](figures/balanced_plot-2.png)<!-- -->
 
 The balanced model results remain consistent with the general pattern
 observed in Figures 1 & 2, despite the relatively restricted sample.
@@ -20889,7 +20889,7 @@ no obvious change in the patterns of level or duration of impact of each
 life
 event.
 
-![](../figures/clean_plot-1.png)<!-- -->![](../figures/clean_plot-2.png)<!-- -->
+![](figures/clean_plot-1.png)<!-- -->![](figures/clean_plot-2.png)<!-- -->
 
 Comparing the uncontaminated effect of the same events to our earlier
 results (e.g., Figure 2), we can see many of the observations we made
@@ -20910,10 +20910,10 @@ outliers are visible in any of the plots.
 
 #### Cognitive wellbeing unconditional model residuals
 
-![](../figures/happyresiduals-1.png)<!-- -->
+![](figures/happyresiduals-1.png)<!-- -->
 
   
 
 #### Affective wellbeing unconditional model residuals
 
-![](../figures/mentalresiduals-1.png)<!-- -->
+![](figures/mentalresiduals-1.png)<!-- -->

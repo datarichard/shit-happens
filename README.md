@@ -358,7 +358,7 @@ produce the largest positive impact on wellbeing, while *Widowed*,
 *Separated* and major financial loss (*Money lost*) produced the largest
 negative impact on wellbeing.
 
-![](../figures/unconditional_good_plot-1.png)<!-- -->
+![](figures/unconditional_good_plot-1.png)<!-- -->
 
 **Figure 1 legend.** *Impact of positively-valenced (“good”) events on
 affective and cognitive wellbeing. For each life event (panel),
@@ -370,7 +370,7 @@ wellbeing. The panels in each figure are ordered by the magnitude change
 in wellbeing (from large to small). Confidence intervals were calculated
 using cluster-robust standard errors (on individuals).*
 
-![](../figures/unconditional_bad_plot-1.png)<!-- -->
+![](figures/unconditional_bad_plot-1.png)<!-- -->
 
 **Figure 2 legend.** *Impact of negatively-valenced (“bad”) events on
 affective and cognitive wellbeing. Coefficients are plotted across
@@ -393,7 +393,7 @@ wellbeing independent of other events, time-varying observable
 characteristics, and all time-invariant characteristics (observed and
 unobservable).
 
-![](../figures/conditional_good_plot-1.png)<!-- -->
+![](figures/conditional_good_plot-1.png)<!-- -->
 
 **Figure 3 legend.** *Conditional effect of positively-valenced (“good”)
 events on affective and cognitive wellbeing, after accounting for all 21
@@ -402,7 +402,7 @@ Coefficients are plotted across time on the x-axis, with the marginal
 effect on the y-axis. Confidence intervals were calculated using
 cluster-robust standard errors (on individuals)*.
 
-![](../figures/conditional_bad_plot-1.png)<!-- -->
+![](figures/conditional_bad_plot-1.png)<!-- -->
 
 **Figure 4 legend.** *Conditional effect of negatively-valenced (“bad”)
 events on affective and cognitive wellbeing, after accounting for all 21
@@ -443,7 +443,7 @@ greater negative effect on cognitive than affective wellbeing, whilst
 moving home was associated with a negative effect on cognitive wellbeing
 but no affective wellbeing response.
 
-![](../figures/auc-1.png)<!-- -->
+![](figures/auc-1.png)<!-- -->
 
 **Figure 5 legend.** *Total impact (AUC) of life-events on affective and
 cognitive wellbeing, for conditional (left panel) and unconditional
