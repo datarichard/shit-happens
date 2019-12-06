@@ -218,12 +218,12 @@ we estimated a series of linear fixed effects regression models.
 Under this approach we have a linear model with \(N\) individuals and
 \(T\) time-points:
 
-<center>
+<p align="center">
 
 y<sub>*it*</sub> = βX<sub>*it*</sub> + α<sub>*i*</sub> +
 ε<sub>*it*</sub>    for *t* = 1…*T* and *i* = 1…*N*    (1)
 
-</center>
+</p>
 
 X<sub>*it*</sub> is a matrix of control variables, that is, a set of
 dummy variables representing lags and leads on the life event. For
@@ -283,11 +283,11 @@ both magnitude and duration of effect, we calculated the
 area-under-the-curve (AUC) for each event in each model (as well as
 variance). The AUC was calculated by:
 
-<center>
+<p align="center">
 
 *AUC*<sub>*event*</sub> = ∑X<sub>β</sub>δ<sub>*t*</sub>    (2)
 
-</center>
+</p>
 
 Where X<sub>β</sub> is a *T* length vector of beta coefficients for each
 time-point, and δ<sub>*t*</sub> is the vector of time (months) between
@@ -301,12 +301,12 @@ paths.
 
 The variance for each *AUC* was estimated by:
 
-<center>
+<p align="center">
 
 σ<sub>*AUC*</sub> = δ<sub>*t*</sub>’**Σ**<sub>*t*</sub>δ<sub>*t*</sub>
    (3)
 
-</center>
+</p>
 
 Where **Σ** is the variance-covariance matrix from each model.
 
