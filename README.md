@@ -5,8 +5,6 @@ N. Kettlewell<sup>1,2,3</sup>, R.W. Morris<sup>4,5</sup>, N.
 Ho<sup>6</sup>, D.A. Cobb-Clark<sup>1,2,3</sup>, S.Cripps<sup>4</sup> &
 N.Glozier<sup>5,6</sup>
 
-   
-
 1.  School of Economics, University of Sydney, NSW, Australia
 2.  ARC Centre of Excellence for Children and Families over the Life
     Course, University of Queensland, QLD, Australia
@@ -17,16 +15,20 @@ N.Glozier<sup>5,6</sup>
     Sydney, NSW, Australia
 6.  Brain and Mind Centre, University of Sydney, NSW, Australia
 
-  **keywords:** life events, affective wellbeing, cognitive wellbeing,
-hedonic adaptation  
+ 
 
-<center>
+ 
+
+ 
+
+ 
+
+**keywords:** life events, affective wellbeing, cognitive wellbeing,
+hedonic adaptation
 
 Date compiled: 06 December, 2019
 
-</center>
-
- 
+-----
 
 # Abstract
 
@@ -218,12 +220,8 @@ we estimated a series of linear fixed effects regression models.
 Under this approach we have a linear model with \(N\) individuals and
 \(T\) time-points:
 
-<p align="center">
-
-y<sub>*it*</sub> = βX<sub>*it*</sub> + α<sub>*i*</sub> +
-ε<sub>*it*</sub>    for *t* = 1…*T* and *i* = 1…*N*    (1)
-
-</p>
+               y<sub>*it*</sub> = βX<sub>*it*</sub> + α<sub>*i*</sub> +
+ε<sub>*it*</sub>    for *t* = 1…*T* and *i* = 1…*N*               (1)
 
 X<sub>*it*</sub> is a matrix of control variables, that is, a set of
 dummy variables representing lags and leads on the life event. For
@@ -283,11 +281,8 @@ both magnitude and duration of effect, we calculated the
 area-under-the-curve (AUC) for each event in each model (as well as
 variance). The AUC was calculated by:
 
-<p style="text-align: center;">
-
-*AUC*<sub>*event*</sub> = ∑X<sub>β</sub>δ<sub>*t*</sub>    (2)
-
-</p>
+               *AUC*<sub>*event*</sub> = ∑X<sub>β</sub>δ<sub>*t*</sub>
+                            (2)
 
 Where X<sub>β</sub> is a *T* length vector of beta coefficients for each
 time-point, and δ<sub>*t*</sub> is the vector of time (months) between
@@ -301,12 +296,9 @@ paths.
 
 The variance for each *AUC* was estimated by:
 
-<p style="text-align: center;">
-
-σ<sub>*AUC*</sub> = δ<sub>*t*</sub>’**Σ**<sub>*t*</sub>δ<sub>*t*</sub>
-   (3)
-
-</p>
+               σ<sub>*AUC*</sub> =
+δ<sub>*t*</sub>’**Σ**<sub>*t*</sub>δ<sub>*t*</sub>
+                                  (3)
 
 Where **Σ** is the variance-covariance matrix from each model.
 

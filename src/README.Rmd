@@ -76,20 +76,27 @@ bad_events <- c(
   )
 ```
 
-\  
-\  
-
 1. School of Economics, University of Sydney, NSW, Australia
 2. ARC Centre of Excellence for Children and Families over the Life Course, University of Queensland, QLD, Australia
 3. Institute of Labor Economics (IZA), Bonn, Germany
 4. Centre for Translational Data Science, University of Sydney, NSW, Australia
 5. Sydney Medical School, Faculty of Medicine and Health, University of Sydney, NSW, Australia
 6. Brain and Mind Centre, University of Sydney, NSW, Australia 
-
+  
 \ 
+  
+\ 
+  
+\ 
+  
+\ 
+  
+
 **keywords:** life events, affective wellbeing, cognitive wellbeing, hedonic adaptation  
-<center>Date compiled: `r format(Sys.time(), '%d %B, %Y')`</center>
-\  
+ 
+Date compiled: `r format(Sys.time(), '%d %B, %Y')`  
+
+***  
 
 # Abstract
 
@@ -168,7 +175,9 @@ Using the quarterly and annual indicators for an event, we modelled the effect o
 
 Under this approach we have a linear model with $N$ individuals and $T$ time-points:  
   
-<p align="center">y<sub>*it*</sub> = &beta;X<sub>*it*</sub> + &alpha;<sub>*i*</sub> + &epsilon;<sub>*it*</sub> \ \ \ for *t* = 1...*T* and *i* = 1...*N*  \ \ \ (1)</p>
+\ \ \ \ \ \ \ \ \ \ \ \ \ \ 
+y<sub>*it*</sub> = &beta;X<sub>*it*</sub> + &alpha;<sub>*i*</sub> + &epsilon;<sub>*it*</sub> \ \ \ for *t* = 1...*T* and *i* = 1...*N*
+\ \ \ \ \ \ \ \ \ \ \ \ \ \ (1)
   
 
 X<sub>*it*</sub> is a matrix of control variables, that is, a set of dummy variables representing lags and leads on the life event. For example, *pre36* = 1 if wellbeing (the outcome) was measured 2-3 years before the life event; *pre24* = 1 if wellbeing was measured 1-2 years before the event;... *post24* = 1 if wellbeing was measured 2-3 years after the event; and *post36* = 1 if wellbeing was measured 3-4 years after the event. In total, we had seven dummy variables indicating the outcome variable y<sub>*it*</sub> was obtained after the life event (*post00*, *post03*, *post06*, *post09*, *post12*, *post24*, *post36*), as well as three dummy variables indicating $y_{it}$ was obtained before the event (*pre12*, *pre24*, *pre36*). Note that *pre36* acted as the reference timepoint against which the effects of all other time-points were expressed.  
@@ -347,17 +356,17 @@ write_csv(results, path = 'results/conditional_results.csv')
 #### Comparing the total impact of life events
 In order to compare the total impact of life events, taking into account both magnitude and duration of effect, we calculated the area-under-the-curve (AUC) for each event in each model (as well as variance). The AUC was calculated by:  
 
-<p style="text-align: center;">
-*AUC*<sub>*event*</sub> = &sum;X<sub>&beta;</sub>&delta;<sub>*t*</sub> \ \ \ (2)
-</p>
-  
+\ \ \ \ \ \ \ \ \ \ \ \ \ \ 
+*AUC*<sub>*event*</sub> = &sum;X<sub>&beta;</sub>&delta;<sub>*t*</sub>
+\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (2)  
 
 Where X<sub>&beta;</sub> is a *T* length vector of beta coefficients for each time-point, and &delta;<sub>*t*</sub> is the vector of time (months) between each time-point. The AUC is therefore the summation of all of the marginal effects on the pre- and post-event dummies (both positive and negative) between -24 months and 48 months of the event occurring, weighted by the number of months the marginal effect represents. This serves as a useful summary of the overall effect of the event on wellbeing and facilitates comparison between events with different time paths.
 
 The variance for each *AUC* was estimated by:  
 
-<p style="text-align: center;">&sigma;<sub>*AUC*</sub> = &delta;<sub>*t*</sub>'**&Sigma;**<sub>*t*</sub>&delta;<sub>*t*</sub> \ \ \ (3)</p>
-  
+\ \ \ \ \ \ \ \ \ \ \ \ \ \ 
+&sigma;<sub>*AUC*</sub> = &delta;<sub>*t*</sub>'**&Sigma;**<sub>*t*</sub>&delta;<sub>*t*</sub>
+\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \  \ \ \ \ \ (3)  
 
 Where **&Sigma;** is the variance-covariance matrix from each model.  
 

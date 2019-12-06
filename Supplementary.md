@@ -5,11 +5,7 @@ N. Kettlewell<sup>1,2,3</sup>, R.W. Morris<sup>4,5</sup>, N.
 Ho<sup>6</sup>, D.A. Cobb-Clark<sup>1,2,3</sup>, S.Cripps<sup>4</sup> &
 N.Glozier<sup>5,6</sup>
 
-<center>
-
 Date compiled: 06 December, 2019
-
-</center>
 
  
 
@@ -19778,10 +19774,10 @@ Standard errors are adjusted for clustering at the individual level.
 #### Comparative Impact on Cognitive vs Affective Wellbeing
 
 The table shows the comparative impact of each event arranged by
-*Z-*value from positive to negative such that events with a larger
+*Z*-value from positive to negative such that events with a larger
 *cognitive* response have the highest (most positive) *Z*-value while
 events with a larger *affective* response have the smallest (most
-negative) *Z-*values.
+negative) *Z*-values.
 
 *Table S6. Differences between Cognitive and Affective
 Wellbeing*

@@ -18,7 +18,7 @@ library(knitr)
 library(kableExtra)
 ```
 
-<center>Date compiled: `r format(Sys.time(), '%d %B, %Y')`</center>
+Date compiled: `r format(Sys.time(), '%d %B, %Y')`
 
 
 ```{r, load_data, include=FALSE}
@@ -431,7 +431,7 @@ ft %>%
 
 #### Comparative Impact on Cognitive vs Affective Wellbeing
 
-The table shows the comparative impact of each event arranged by *Z-*value from positive to negative such that events with a larger _cognitive_ response have the highest (most positive) *Z*-value while events with a larger _affective_ response have the smallest (most negative) *Z-*values.  
+The table shows the comparative impact of each event arranged by _Z_-value from positive to negative such that events with a larger _cognitive_ response have the highest (most positive) _Z_-value while events with a larger _affective_ response have the smallest (most negative) _Z_-values.  
 
 *Table S6. Differences between Cognitive and Affective Wellbeing*  
 
