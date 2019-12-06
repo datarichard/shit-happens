@@ -1,7 +1,0 @@
-.DS_Store
-*.dta
-*.rds
-*.pdf
-**/docs
-**/notebooks
-**/paper
