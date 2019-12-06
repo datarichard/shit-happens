@@ -1,12 +1,14 @@
 table_auc <- function(covar.list, coef.tb) {
+  
+  #### Calculate AUC ####
   event_codes = unique(coef.tb$code)
-  timelevels = c('pre36', 'pre24', 'pre12', 'post00', 'post03', 'post06', 
-                 'post09', 'post12', 'post24', 'post36')
+  timelevels = c('pre24', 'pre12', 'post03', 'post06', 
+                 'post09', 'post12', 'post24', 'post36', 'post48')
   t.delta = c(12, 12, 3, 3, 3, 3, 12, 12, 12)
   
   auc <- vector(mode = "numeric", length = length(event_codes))
   auc.var <- vector(mode = "numeric", length = length(event_codes))
-  auc.n <- vector()
+  auc.df <- vector()
   names(auc) <- event_codes
   names(auc.var) <- event_codes
   auc.table <- tibble()
@@ -23,11 +25,11 @@ table_auc <- function(covar.list, coef.tb) {
       # auc[event] = sum(abs(beta.coef$estimate)*t.delta)
       auc[event] = sum(beta.coef$estimate*t.delta)
       auc.var[event] <- as.numeric(t(t.delta) %*% beta.vcov %*% t.delta)
-      auc.n[event] <- unique(coef.tb[coef.tb$code == event & coef.tb$outcome == dv, "N"])
+      auc.df[event] <- unique(coef.tb[coef.tb$code == event & coef.tb$outcome == dv, "N"])
     }
     
-    bind_rows(auc, auc.var, auc.n) %>%
-      mutate(x = c("auc", "variance", "n")) %>%
+    bind_rows(auc, auc.var, auc.df) %>%
+      mutate(x = c("auc", "variance", "N")) %>%
       gather(code, val, -x) %>%
       spread(x, val) -> tb
     
@@ -36,7 +38,40 @@ table_auc <- function(covar.list, coef.tb) {
     
   }
   
-  # auc.table <- mutate(auc.table, code = factor(code, levels = event_codes, ordered = TRUE)) 
-  # levels(auc.table$code) <- renamevents
+  #### Add p-values ####
+  auc.table %>%
+    filter(outcome == "cognitive") %>%
+    select(code, auc) %>%
+    deframe() -> coef_cognitive
+  
+  auc.table %>%
+    filter(outcome == "affective") %>%
+    select(code, auc) %>%
+    deframe() -> coef_affective
+  
+  auc.table %>%
+    filter(outcome == "cognitive") %>%
+    select(code, variance) %>%
+    deframe() -> var_cognitive
+  
+  auc.table %>%
+    filter(outcome == "affective") %>%
+    select(code, variance) %>%
+    deframe() -> var_affective
+  
+  .num = coef_cognitive - coef_affective
+  .den = sqrt(var_cognitive + var_affective)
+  
+  z_score = .num / .den
+  p_2tail = pnorm(abs(z_score), lower.tail = FALSE)*2
+  
+  auc.table %<>%
+    left_join(
+      enframe(z_score, name = "code", value = "z_score"), by = "code"
+      ) %>%
+    left_join(
+      enframe(p_2tail, name = "code", value = "p_2tail"), by = "code"
+      ) -> auc.table
+  
   return(auc.table)
 }

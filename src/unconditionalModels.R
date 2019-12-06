@@ -6,8 +6,8 @@ unconditionalModels <- function(dependent.df, independent.list, timelevels, even
   require(broom)
   
   # Table to store results:
-  coefs.df <- data_frame()
-  resid.df <- data_frame()
+  coefs.df <- tibble()
+  resid.df <- tibble()
   vcov.list <- vector(mode = 'list', length = length(events))
   names(vcov.list) <- events
   
@@ -15,15 +15,15 @@ unconditionalModels <- function(dependent.df, independent.list, timelevels, even
     
     #### Create a model dataframe ####
     independent.list[[event]] %>%
-      mutate_if(is.numeric, funs(replace_na(., 0))) -> X.df
+      mutate_if(is.numeric, list(~replace_na(., 0))) -> X.df
     
     # Join and scale the dependent variable
     dependent.df %>%
       inner_join(X.df, by = c('xwaveid', 'wave')) %>%
       group_by(xwaveid) %>%
-      mutate(Y = scale(Y)) %>% # scaling produces NA when no variation
-      replace_na(list("Y" = 0)) %>% 
-      ungroup() -> vars.df 
+      mutate(Y = scale(Y)) %>% # scaling produces NaN when no variation
+      ungroup() %>%            # so replace NaN with NA
+      mutate(Y = ifelse(is.nan(Y), NA, Y)) -> vars.df 
     
     vars.df %>%
       select(-wave, everything(), -xwaveid, -Y) %>%
@@ -50,15 +50,17 @@ unconditionalModels <- function(dependent.df, independent.list, timelevels, even
       bind_rows(coefs.df) -> coefs.df
     
     # Get the residuals
-    vars.df$resid <- resid(fe)
-    vars.df$pred <- predict(fe)
-    vars.df %>%
+    .df <- na.omit(vars.df) # to match the dimensions
+    .df$resid <- resid(fe)
+    .df$pred <- predict(fe)
+    .df %>%
       mutate(code = event) %>%
       select(xwaveid, wave, code, pred, resid) %>%
       bind_rows(resid.df) -> resid.df
     
     # Get the variance-covariance matrix
-    vcov.mat <- vcovHC(fe, type = "HC1")[1:9, 1:9] # vcovHC(mdl, type = "sss")[1:9, 1:9]
+    # vcov.mat <- vcovHC(fe, type = "HC1")[1:9, 1:9] 
+    vcov.mat <- vcovHC(fe, type = "sss")[1:9, 1:9]
     vcov.list[[event]] <- vcov.mat
     
   }

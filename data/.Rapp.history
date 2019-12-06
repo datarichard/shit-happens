@@ -1,0 +1,2 @@
+load("/Users/rich/Dropbox/HILDA/shit-happens/data/rawevents.rds")
+load("/Users/rich/Dropbox/HILDA/shit-happens/data/events_by_time.rds")

@@ -108,8 +108,48 @@ for (df in events_by_time) {
 # Get outcome variables
 mcs <- GetMCS(hilda)
 
+GetRaws(hilda, c(
+  'gh9a', # Vitality: feel full of life (lower is better)*
+  'gh9b', # Mental H: Been a nervous person (higher is better)
+  'gh9c', # Mental H: Felt so down in the dumps (higher is better)
+  'gh9d', # Mental H: Felt calm and peaceful (lower is better)*
+  'gh9e', # Vitality: Have a lot of energy (lower is better)*
+  'gh9f', # Mental H: Felt down (higher is better)
+  'gh9g', # Vitality: Felt worn out (higher is better)
+  'gh9h', # Mental H: Been happy (lower is better)*
+  'gh9i'  # Vitality: Felt tired (higher is better)
+  )
+) -> gh9
+
+reversed_items <- c('gh9a', 'gh9d', 'gh9e', 'gh9h')
+
+gh9 %>%
+  # Recode missing to NA
+  spread(code, val) %>%
+  mutate_if(is.double, ~ ifelse(. < 0, NA_real_, .)) %>%
+  # Reverse score
+  mutate_at(reversed_items, ~ 7 - .) -> gh9_items
+
+write_rds(gh9_items, 'data/gh9_items.rds')
+
+gh9_items %>%
+  gather(code, val, -xwaveid, -wave) %>%
+  # Impute average if less than half missing (see ghmh data dictionary)
+  group_by(xwaveid, wave) %>%
+  mutate(
+    sum_na = sum(is.na(val)),
+    mean_na = mean(val, na.rm = TRUE),
+    imputed = ifelse(is.na(val) & sum_na < 5, mean_na, val),
+    sum_imputed = sum(imputed),
+    code = "gh9_sum"
+  ) %>% 
+  select(xwaveid, wave, code, val = sum_imputed) %>%
+  distinct() %>%
+  ungroup() -> gh9_imputed
+
 GetRaws(hilda, c('losat', 'ghmh')) %>%
-  bind_rows(mcs) -> outcomes
+  bind_rows(mcs) %>%
+  bind_rows(gh9_imputed) -> outcomes
 
 write_rds(outcomes, 'data/outcomes.rds')
 

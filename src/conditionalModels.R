@@ -6,7 +6,7 @@ conditionalModels <- function(dependent.df, independent.list, covariates.df, tim
   require(broom)
   
   # Tables and lists to store results:
-  coef.tb <- data_frame()
+  coef.tb <- tibble()
   vcov.list <- vector(mode = 'list', length = length(events))
   names(vcov.list) <- events
   
@@ -14,15 +14,15 @@ conditionalModels <- function(dependent.df, independent.list, covariates.df, tim
     
     #### Create a model dataframe ####
     independent.list[[event]] %>%
-      mutate_if(is.numeric, funs(replace_na(., 0))) -> X.df
+      mutate_if(is.numeric, list( ~replace_na(., 0))) -> X.df
     
     # Join the target event with the outcome variable and scale
-    dependent.df %>% 
+    dependent.df %>%
       inner_join(X.df, by = c('xwaveid', 'wave')) %>%
       group_by(xwaveid) %>%
-      mutate(Y = scale(Y)) %>% # scaling produces NA when no variation
-      replace_na(list("Y" = 0)) %>% 
-      ungroup() -> vars.df 
+      mutate(Y = scale(Y)) %>% # scaling produces NaN when no variation
+      ungroup() %>%            # so replace NaN with 0 and leave NA in
+      mutate(Y = ifelse(is.nan(Y), NA, Y)) -> vars.df 
     
     # get other events as covariates
     covariate.events = events[which(events != event)]
@@ -30,12 +30,12 @@ conditionalModels <- function(dependent.df, independent.list, covariates.df, tim
     for (covar in covariate.events) {
       independent.list[[covar]] %>%
         rename_at(vars(starts_with('p')), ~ paste0(., covar)) %>%
-        mutate_if(is.numeric, funs(replace_na(., 0))) %>%
+        mutate_if(is.numeric, list(~ replace_na(., 0))) %>%
         right_join(covars.df, by = c("xwaveid", "wave")) -> covars.df
     }
     
     covars.df %>%
-      mutate_if(is.numeric, funs(replace_na(., 0))) -> covars.df
+      mutate_if(is.numeric, list(~ replace_na(., 0))) -> covars.df
     
     # join target variables with covariates
     vars.df %>%
@@ -79,7 +79,8 @@ conditionalModels <- function(dependent.df, independent.list, covariates.df, tim
       bind_rows(coef.tb) -> coef.tb
     
     # Get the variance-covariance matrix
-    vcov.mat <- vcovHC(fe, type = "HC1")[1:9, 1:9] # vcovHC(mdl, type = "sss")[1:9, 1:9]
+    # vcov.mat <- vcovHC(fe, type = "HC1")[1:9, 1:9] 
+    vcov.mat <- vcovHC(fe, type = "sss")[1:9, 1:9]
     vcov.list[[event]] <- vcov.mat
   }
   
