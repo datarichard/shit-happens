@@ -283,7 +283,7 @@ both magnitude and duration of effect, we calculated the
 area-under-the-curve (AUC) for each event in each model (as well as
 variance). The AUC was calculated by:
 
-<p align="center">
+<p style="text-align: center;">
 
 *AUC*<sub>*event*</sub> = ∑X<sub>β</sub>δ<sub>*t*</sub>    (2)
 
@@ -301,7 +301,7 @@ paths.
 
 The variance for each *AUC* was estimated by:
 
-<p align="center">
+<p style="text-align: center;">
 
 σ<sub>*AUC*</sub> = δ<sub>*t*</sub>’**Σ**<sub>*t*</sub>δ<sub>*t*</sub>
    (3)
